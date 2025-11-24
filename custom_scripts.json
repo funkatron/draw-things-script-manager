@@ -159,5 +159,17 @@
     "file": "FUNK-DT Env Probe.js",
     "description": "",
     "author": ""
+  },
+  {
+    "name": "Funk Negative Prompt Presets",
+    "file": "FUNK-Negative Prompt Presets.js",
+    "description": "",
+    "author": ""
+  },
+  {
+    "name": "Wildcards Funkatron 0.1",
+    "file": "Wildcards-funkatron_0.1.js",
+    "description": "",
+    "author": ""
   }
 ]
