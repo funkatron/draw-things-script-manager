@@ -258,20 +258,7 @@ Git integration is automatically enabled if git is available. The tool works wit
 
 ## Requirements
 
-- **Python 3.10+** (uses modern features like `match/case` and `|` union types)
+- **Python 3.10+**
 - No external dependencies (uses only standard library)
 - Git (optional, for change tracking and rollback features)
-
-## Architecture
-
-The tool is built using SOLID principles:
-- **Single Responsibility**: Each class has one clear purpose
-- **Dependency Inversion**: Depends on abstractions, not concrete implementations
-- **Factory Pattern**: Easy setup with `ScriptManager.create()`
-
-For developers: The code uses modern Python idioms including:
-- Type hints with `list[...]` and `dict[...]` syntax (Python 3.9+)
-- Union types with `|` operator (Python 3.10+)
-- Pattern matching with `match/case` (Python 3.10+)
-- `pathlib.Path` throughout instead of `os.path`
 
