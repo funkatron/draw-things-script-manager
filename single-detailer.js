@@ -14,7 +14,7 @@
 
 // The prompt to give to the detailer. 
 // Leave null if you just want to take the prompt from the UI
-const DETAILER_PROMPT = "detailed portrait of p; // or something like "Portrait of a woman."
+const DETAILER_PROMPT = null; // or something like "Portrait of a woman."
 
 // Instead of replacing prompt to detail with, this appends to the UI Prompt
 const DETAILER_PROMPT_SUFFIX = null; //"Photo"; // or something like "Portrait of ohwx woman."
@@ -24,8 +24,8 @@ const DETAILER_STEPS = null;
 const DETAILER_TEXT_GUIDANCE = null;
 
 // Resolution to use when detailing. Must be multiple of 64.
-const DETAILER_WIDTH = 1280;
-const DETAILER_HEIGHT = 1280;
+const DETAILER_WIDTH = 1024;
+const DETAILER_HEIGHT = 1024;
 
 // Number of largest detected faces to process. 
 // If you want all faces set it to something large like 99.
@@ -172,7 +172,7 @@ function getCurrentTimeString() {
    const year = now.getFullYear();
    const hours = now.getHours().toString().padStart(2, '0');
    const minutes = now.getMinutes().toString().padStart(2, '0');
-   const seconds = now.getSeconds().toString().padStart(2, '0');	
+   const seconds = now.getSeconds().toString().padStart(2, '0');  
    
    return `${month}_${day}_${year}_${hours}_${minutes}_${seconds}`;
 }
