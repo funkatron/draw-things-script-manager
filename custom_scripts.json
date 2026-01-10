@@ -171,5 +171,11 @@
     "file": "Wildcards-funkatron_0.1.js",
     "description": "Batch wildcard prompt generator supporting random, sequential, and cartesian expansion modes for generating multiple variations.",
     "author": "funkatron"
+  },
+  {
+    "name": "Waveform Generator",
+    "file": "waveform-generator.js",
+    "description": "",
+    "author": ""
   }
 ]
