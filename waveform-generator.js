@@ -141,7 +141,7 @@ function applyGuidanceWaveform(config, waveFunc, frame, totalFrames, min = 1.0, 
 // Main Script
 // ============================================================================
 
-async function main() {
+function main() {
   const userSelection = requestFromUser("Waveform Generator", "Apply", function() {
     return [
       this.section("Target Value", "What configuration value to modify:", [
@@ -155,12 +155,13 @@ async function main() {
         this.slider(10, this.slider.fractional(0), 0, 10, "Max Value")
       ]),
       this.section("Animation", "Frame settings:", [
-        this.slider(10, this.slider.integer(1), 1, 100, "Total Frames"),
+        this.slider(10, this.slider.fractional(0), 1, 100, "Total Frames"),
         this.slider(0, this.slider.fractional(2), 0, 1, "Phase Offset (0-1)")
       ]),
       this.section("Options", "", [
         this.switch(false, "Preview values only (don't apply)"),
-        this.switch(false, "Generate animation (frame-by-frame)")
+        this.switch(false, "Generate animation (frame-by-frame)"),
+        this.switch(false, "Auto-render after applying (start generation)")
       ])
     ];
   });
@@ -169,10 +170,11 @@ async function main() {
   const waveformType = userSelection[1][0];
   const minValue = userSelection[2][0];
   const maxValue = userSelection[2][1];
-  const totalFrames = Math.floor(userSelection[3][0]);
-  const phaseOffset = userSelection[3][1];
+  const totalFrames = Math.max(1, Math.floor(userSelection[3][0]));
+  const phaseOffset = Math.max(0, Math.min(1, userSelection[3][1]));
   const previewOnly = userSelection[4][0];
   const generateAnimation = userSelection[4][1];
+  const autoRender = userSelection[4][2];
 
   // Select waveform function
   let waveFunc;
@@ -186,6 +188,12 @@ async function main() {
   }
 
   // Get configuration
+  if (!pipeline || !pipeline.configuration) {
+    canvas.notify?.("❌ Error: Pipeline configuration not available");
+    return;
+  }
+
+  // Create a copy of the configuration
   const config = { ...pipeline.configuration };
   const values = [];
 
@@ -243,75 +251,110 @@ async function main() {
 
   // Apply waveform
   if (generateAnimation) {
-    // Frame-by-frame animation
+    // Frame-by-frame animation - render each frame with different waveform values
     const waveformNames = ["Sine", "Sawtooth", "Square", "Ramp", "Gaussian"];
     const targetNames = ["zcfg (shift)", "Cropping", "Strength", "Guidance Scale"];
-
-    canvas.notify?.(`🎬 Starting frame-by-frame animation...\n${totalFrames} frames with ${waveformNames[waveformType]} waveform`);
 
     // Store original prompt
     const originalPrompt = pipeline.prompts?.prompt || "";
     const originalNegativePrompt = pipeline.prompts?.negativePrompt || "";
 
-    // Generate frames sequentially
+    console.log(`🎬 Starting frame-by-frame animation: ${totalFrames} frames with ${waveformNames[waveformType]} waveform`);
+    canvas.notify?.(`🎬 Starting frame-by-frame animation...\n${totalFrames} frames with ${waveformNames[waveformType]} waveform`);
+
+    const startTime = Date.now();
+
+    // Render each frame with its waveform value
     for (let frame = 0; frame < totalFrames; frame++) {
       // Create config for this frame
+      // Use spread operator for shallow copy (faster, and config objects are usually flat)
       const frameConfig = { ...config };
+      frameConfig.batchSize = 1;
+      frameConfig.batchCount = 1;
 
       // Apply waveform value for this frame
       const value = applyWaveformToConfig(frameConfig, frame, totalFrames);
 
-      // Ensure batch settings
-      frameConfig.batchSize = 1;
-      frameConfig.batchCount = 1;
-
       // Update progress
       const progress = ((frame + 1) / totalFrames * 100).toFixed(1);
+      const frameStartTime = Date.now();
+      console.log(`Frame ${frame + 1}/${totalFrames} (${progress}%): ${targetNames[targetType]} = ${value.toFixed(3)}`);
       canvas.notify?.(`Frame ${frame + 1}/${totalFrames} (${progress}%)\n${targetNames[targetType]}: ${value.toFixed(3)}`);
 
       // Render this frame
       try {
+        // Call pipeline.run with the frame-specific configuration
+        // Note: pipeline.run() is blocking and will wait for render to complete
         pipeline.run({
           configuration: frameConfig,
           prompt: originalPrompt,
           negativePrompt: originalNegativePrompt
         });
-
-        // Small delay to allow rendering to complete
-        // Adjust timing based on your needs
-        if (frame < totalFrames - 1) {
-          await new Promise(resolve => setTimeout(resolve, 200));
-        }
+        const frameTime = ((Date.now() - frameStartTime) / 1000).toFixed(1);
+        console.log(`Frame ${frame + 1} completed in ${frameTime}s`);
       } catch (error) {
-        canvas.notify?.(`❌ Error rendering frame ${frame + 1}: ${error.message}`);
+        console.error(`Error rendering frame ${frame + 1}:`, error);
+        const errorMsg = error?.message || error?.toString() || String(error) || "Unknown error";
+        console.error("Full error object:", error);
+        canvas.notify?.(`❌ Error rendering frame ${frame + 1}:\n${errorMsg}\n\nStopping animation.`);
         break;
       }
     }
 
-    canvas.notify?.(
+    const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+
+    const completionMessage =
       `✅ Animation complete!\n` +
-      `Generated ${totalFrames} frames\n` +
+      `Generated ${totalFrames} frames in ${totalTime}s\n` +
       `Waveform: ${waveformNames[waveformType]}\n` +
       `Target: ${targetNames[targetType]}\n` +
-      `Range: ${minValue} - ${maxValue}`
-    );
+      `Range: ${minValue} - ${maxValue}`;
+
+    console.log(completionMessage);
+    canvas.notify?.(completionMessage);
+
   } else {
     // Apply to current frame only
     const currentFrame = 0;
     let value = applyWaveformToConfig(config, currentFrame, totalFrames);
 
+    // Apply the configuration
     Object.assign(pipeline.configuration, config);
 
     const waveformNames = ["Sine", "Sawtooth", "Square", "Ramp", "Gaussian"];
     const targetNames = ["zcfg (shift)", "Cropping", "Strength", "Guidance Scale"];
 
-    canvas.notify?.(
-      `✅ Applied ${waveformNames[waveformType]} waveform\n` +
-      `Target: ${targetNames[targetType]}\n` +
-      `Value: ${value.toFixed(3)} (range: ${minValue} - ${maxValue})\n` +
-      `Frame: ${currentFrame + 1}/${totalFrames}\n\n` +
-      `💡 Enable "Generate batch" to create ${totalFrames} animated frames`
-    );
+    // Show what was applied
+    let message = `✅ Applied ${waveformNames[waveformType]} waveform\n`;
+    message += `Target: ${targetNames[targetType]}\n`;
+    message += `Value: ${value.toFixed(3)} (range: ${minValue} - ${maxValue})\n`;
+    message += `Frame: ${currentFrame + 1}/${totalFrames}\n\n`;
+
+    // Show the actual config value that was set
+    switch (targetType) {
+      case 0: message += `shift (zcfg): ${pipeline.configuration.shift}\n`; break;
+      case 1: message += `cropLeft: ${pipeline.configuration.cropLeft || 'N/A'}\n`; break;
+      case 2: message += `strength: ${pipeline.configuration.strength}\n`; break;
+      case 3: message += `guidanceScale: ${pipeline.configuration.guidanceScale}\n`; break;
+    }
+
+    message += `\n💡 Enable "Generate animation" to create ${totalFrames} animated frames`;
+
+    canvas.notify?.(message);
+
+    // Auto-render if requested
+    if (autoRender) {
+      const originalPrompt = pipeline.prompts?.prompt || "";
+      const originalNegativePrompt = pipeline.prompts?.negativePrompt || "";
+      pipeline.run({
+        configuration: config,
+        prompt: originalPrompt,
+        negativePrompt: originalNegativePrompt
+      });
+      canvas.notify?.("🎨 Rendering started with waveform value applied");
+    } else {
+      canvas.notify?.("💡 Configuration updated. Click 'Run' to render with the new value.");
+    }
   }
 }
 
