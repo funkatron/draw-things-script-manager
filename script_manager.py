@@ -5,17 +5,16 @@ Draw Things Script Manager
 A tool to help manage scripts in Draw Things:
 - List all scripts with metadata
 - Validate scripts (check for missing files, invalid JSON)
-- Find orphaned entries
-- Sync metadata between files and JSON
-- Extract metadata from script comments
+- Sync orphaned files to custom_scripts.json
+- Normalize metadata (fix case, sort entries)
+- Rollback changes using git history
+- Show diffs of changes
 
 SAFETY: This tool ONLY modifies custom_scripts.json. It NEVER modifies,
 renames, or deletes script files themselves. All operations are idempotent.
 
-FILE OPERATIONS:
-- install: Creates new files (can use custom name), never renames existing files
-- sync: Only adds entries to JSON, never touches actual script files
-- All other commands: Read-only operations on script files
+See DRAW_THINGS_API.md for JavaScript API documentation.
+See README_SCRIPT_MANAGER.md for usage instructions.
 """
 
 from __future__ import annotations

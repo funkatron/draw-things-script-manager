@@ -2,6 +2,8 @@
 
 A Python tool to help manage scripts in Draw Things.
 
+> **Writing scripts?** See [DRAW_THINGS_API.md](DRAW_THINGS_API.md) for the JavaScript API reference.
+
 ## Safety & Idempotency
 
 **This tool is designed to be safe and idempotent:**
