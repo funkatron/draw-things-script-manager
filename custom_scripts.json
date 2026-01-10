@@ -98,14 +98,14 @@
   {
     "name": "Funk Dt Env Probe",
     "file": "FUNK-DT Env Probe.js",
-    "description": "",
-    "author": ""
+    "description": "Diagnostic script that probes Draw Things API to detect configuration access patterns (function vs object style).",
+    "author": "funkatron"
   },
   {
     "name": "Funk Negative Prompt Presets",
     "file": "FUNK-Negative Prompt Presets.js",
-    "description": "",
-    "author": ""
+    "description": "Applies negative prompt presets with clarity tuning (steps/strength/shift), optional sampler override, and progress logging during render.",
+    "author": "funkatron"
   },
   {
     "name": "SD Ultimate Upscale",
@@ -169,7 +169,7 @@
   {
     "name": "Wildcards Funkatron 0.1",
     "file": "Wildcards-funkatron_0.1.js",
-    "description": "",
-    "author": ""
+    "description": "Batch wildcard prompt generator supporting random, sequential, and cartesian expansion modes for generating multiple variations.",
+    "author": "funkatron"
   }
 ]
