@@ -90,7 +90,7 @@ The `pipeline.configuration` object contains all generation settings:
   // === Dimensions ===
   width: 1024,              // Must be multiple of 64
   height: 1024,             // Must be multiple of 64
-  
+
   // === Generation Parameters ===
   steps: 20,                // Number of inference steps
   strength: 0.75,           // Denoising strength (0-1, for img2img)
@@ -99,15 +99,15 @@ The `pipeline.configuration` object contains all generation settings:
   shift: 3.0,               // zcfg / shift value (model-dependent)
   clipSkip: 1,              // CLIP skip layers
   sharpness: 0,             // Output sharpening
-  
+
   // === Sampler ===
   sampler: 0,               // SamplerType enum value (see below)
   stochasticSamplingGamma: 0.3,  // For stochastic samplers
-  
+
   // === Batch Settings ===
   batchSize: 1,             // Images per batch
   batchCount: 1,            // Number of batches
-  
+
   // === Models ===
   model: "model_name.ckpt",           // Base model filename
   loras: [                            // LoRA array
@@ -117,7 +117,7 @@ The `pipeline.configuration` object contains all generation settings:
   upscaler: "4x UltraSharp",          // Upscaler name or null
   refinerModel: null,                 // SDXL refiner or null
   faceRestoration: null,              // Face restoration or null
-  
+
   // === Tiled Processing (for large images) ===
   tiledDecoding: false,
   decodingTileWidth: 1024,
@@ -127,23 +127,23 @@ The `pipeline.configuration` object contains all generation settings:
   diffusionTileWidth: 1024,
   diffusionTileHeight: 1024,
   diffusionTileOverlap: 128,
-  
+
   // === Inpainting ===
   maskBlur: 8,
   maskBlurOutset: 0,
   preserveOriginalAfterInpaint: true,
-  
+
   // === Hi-Res Fix ===
   hiresFix: false,
-  
+
   // === Advanced ===
   zeroNegativePrompt: false,
   resolutionDependentShift: true,
   clipLText: "",                      // CLIP-L text (for dual-encoder models)
-  
+
   // === Video/Animation ===
   numFrames: 16,                      // For video models
-  
+
   // === Cropping (for some models) ===
   cropLeft: 0,
   cropTop: 0,
@@ -222,7 +222,7 @@ const faces = canvas.detectFaces();
 // }
 
 // Sort by size (largest first)
-faces.sort((a, b) => 
+faces.sort((a, b) =>
   (b.size.width * b.size.height) - (a.size.width * a.size.height)
 );
 ```
@@ -380,12 +380,12 @@ for (let frame = 0; frame < totalFrames; frame++) {
   const frameConfig = { ...pipeline.configuration };
   frameConfig.batchSize = 1;
   frameConfig.batchCount = 1;
-  
+
   // Modify per-frame values
   frameConfig.shift = calculateValue(frame, totalFrames);
-  
+
   canvas.notify?.(`Frame ${frame + 1}/${totalFrames}`);
-  
+
   pipeline.run({
     configuration: frameConfig,
     prompt: originalPrompt
