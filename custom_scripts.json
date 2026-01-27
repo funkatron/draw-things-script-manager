@@ -167,8 +167,8 @@
     "author": "wetcircuit"
   },
   {
-    "name": "Wildcards Funkatron 0.1",
-    "file": "Wildcards-funkatron_0.1.js",
+    "name": "Funk Wildcards",
+    "file": "Funk Wildcards.js",
     "description": "Batch wildcard prompt generator supporting random, sequential, and cartesian expansion modes for generating multiple variations.",
     "author": "funkatron"
   },
